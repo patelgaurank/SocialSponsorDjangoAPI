@@ -1,0 +1,115 @@
+-------------- Django setup
+py -m pip freeze > requirements.txt
+py -m pip install -r requirements.txt
+py manage.py makemigrations --dry-run --verbosity 3
+py manage.py runserver
+py manage.py createsuperuser
+pip install coverage
+coverage run --omit='*/venv/*' manage.py test
+coverage html
+pip install djangorestframwork
+
+--------------- Change django project secrate key
+py manage.py shell -c
+from django.core.management.utils import get_random_secret_key;
+print(get_random_secret_key())
+
+Or copy bellow code in terminal
+py manage.py shell -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+
+--------------- Update need to added in rest_framwork_simplejwt
+rest_framework_simplejwt/token_blacklist/admin.py and
+setting def has_delete_permission(self, *args, **kwargs):
+return False to True
+
+--------------- Delete all rows
+Models.objects.all().delete()
+
+--------------- Update Superuser
+Models.objects.filter(email='xamapatel5@gmail.com').update(is_active=True, is_staff=True)
+
+
+--------------- To find city, State, County by zip code
+import pgeocode as pg
+nomi = pg.Nominatim('in')
+print(nomi.query_postal_code('390002'))
+
+
+---------------- rest_framework_simplejwt
+# Use Django's standard `django.contrib.auth` permissions,
+# or allow read-only access for unauthenticated users.
+# 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+# 'rest_framework.permissions.DjangoModelPermissions',
+# 'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+# 'rest_framework.permissions.IsAuthenticated',
+# 'rest_framework.authentication.TokenAuthentication',
+# it is a good idea to disable the browseable API in production with this configuration
+# 'DEFAULT_RENDERER_CLASSES': [
+#     'rest_framework.renderers.JSONRenderer',
+# ]
+# Permissions:
+# AllowAny
+# IsAuthenticated
+# IsAdminUser
+# IsAuthenticatedOrReadOnly
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': (
+#         'rest_framework_simplejwt.authentication.JWTAuthentication',
+#     )
+# }
+
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
+#     # "https://www.infarmsherbs.com",
+# ]
+
+# APPEND_SLASH=False
+
+----------- login from view
+# token = Token.for_user(NUser)
+# loginuser = authenticate(email=email,password="DoNotOpen75")
+# login(request,loginuser)                            
+# url = request.scheme + '://' + request.META['HTTP_HOST'] + '/api/token/'
+# payload = json.dumps({
+# "email": email,
+# "password": "DoNotOpen75"
+# })
+# headers = {
+# 'Content-Type': 'application/json',
+# 'Cookie': 'csrftoken=ohV8HrC4xIzYk7aijQGXmMmh3pFlBlUDA3Nn8Irf1jeqq7GpkYWo6hLMqLTPYuvT'
+# }
+# r = requests.request("POST", url, headers=headers, data=payload).json()
+# r["detail"]="Successed!"
+# return Response(data=r, status=status.HTTP_200_OK)
+refresh = RefreshToken.for_user(NUser)
+return Response(data={
+    'detail':'Access approved.',
+    'refresh': str(refresh),
+    'access': str(refresh.access_token),
+}, status=status.HTTP_200_OK)
+
+
+Next js fetch -------------
+    const getAuth = () => {
+      var myHeaders = new Headers();
+      var baseURL = process.env.NEXT_PUBLIC_BACKEND_URL;
+      myHeaders.append("Content-Type", "application/json");
+      
+      var raw = JSON.stringify({
+        "email": "patelgaurank@gmail.com",
+        "password": "DoNotOpen75"
+      });
+      
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+      };
+      
+      fetch(baseURL+"token/", requestOptions)
+        .then(response => response.text())
+        .then(result => console.log(result))
+        .catch(error => console.log('error', error));      
+    };
